@@ -1,3 +1,4 @@
+import xlrd as xlrd
 from openpyxl import *
 
 
@@ -95,16 +96,39 @@ class ReadExcel(object):
             rowdata.append(cellvalue)
         return rowdata
 
-    # 设置某个单元格的值
-    def set_cell_value(self, row, colunm, cellvalue, file):
-        self.file = file
-        self.wb = load_workbook(self.file)
-        sheets = self.wb.get_sheet_names()
-        self.sheet = sheets[0]
-        self.ws = self.wb[self.sheet]
-        try:
-            self.ws.cell(row=row, column=colunm).value = cellvalue
-            self.wb.save(self.file)
-        except:
-            self.ws.cell(row=row, column=colunm).value = "writefail"
-            self.wb.save(self.file)
+    # 获取EXCEL所有数据以列表字典形式返回
+    def get_all_values(self, file, sheet_name):
+        """ 获取EXCEL所有数据以列表字典形式返回
+
+        Examples:
+        | ${getAllValues} | get_all_values | C:\\Users\\Administrator\\Desktop\\123.xlsx | sheet_name |
+
+        Return:
+        | 列表 | [{"name":"张三","age":23},{"name":"李四","age":23}] |
+
+        """
+        bk = xlrd.open_workbook(file)
+        sh = bk.sheet_by_name(sheet_name)
+        row_num = sh.nrows
+        data_list = []
+        for i in range(1, row_num):
+            row_data = sh.row_values(i)
+            data = {}
+            for index, key in enumerate(sh.row_values(0)):
+                data[key] = row_data[index]
+            data_list.append(data)
+        return data_list
+
+    # # 设置某个单元格的值
+    #     # def set_cell_value(self, row, colunm, cellvalue, file):
+    #     #     self.file = file
+    #     #     self.wb = load_workbook(self.file)
+    #     #     sheets = self.wb.get_sheet_names()
+    #     #     self.sheet = sheets[0]
+    #     #     self.ws = self.wb[self.sheet]
+    #     #     try:
+    #     #         self.ws.cell(row=row, column=colunm).value = cellvalue
+    #     #         self.wb.save(self.file)
+    #     #     except:
+    #     #         self.ws.cell(row=row, column=colunm).value = "writefail"
+    #     #         self.wb.save(self.file)
